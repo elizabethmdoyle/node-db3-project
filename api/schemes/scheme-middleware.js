@@ -1,6 +1,5 @@
-const Scheme = require('./scheme-model');
-
-
+const db = require("../../data/db-config");
+const Scheme = "./scheme-model.js";
 /*
   If `scheme_id` does not exist in the database:
 
@@ -10,21 +9,22 @@ const Scheme = require('./scheme-model');
   }
 */
 const checkSchemeId = async (req, res, next) => {
-
   try {
-    const scheme = await Scheme.findById(req.params.id);
+    const validateId = await db("schemes")
+      .where("scheme_id", req.params.scheme_id)
+      .first();
 
-    if(!scheme) {
-      next({status:404,message: `scheme with scheme_id ${req.params.id} not found` })
+    if (!validateId) {
+      res.status(404).json({
+        message: `scheme with scheme_id ${req.params.scheme_id} not found`,
+      });
     } else {
-      req.car = car;
-      next()
+      next();
     }
-  } catch(err) {
-    next(err)
+  } catch (err) {
+    next(err);
   }
-
-}
+};
 
 /*
   If `scheme_name` is missing, empty string or not a string:
@@ -35,17 +35,19 @@ const checkSchemeId = async (req, res, next) => {
   }
 */
 const validateScheme = (req, res, next) => {
-
-  const {scheme_name} = req.body;
-
-  if ( !scheme_name || typeof(scheme_name) !== 'string' || !scheme_name.trim() ) {
-    next({status: 400, message: 'invalid scheme_name'})
+  const { scheme_name } = req.body;
+  if (
+    scheme_name === "" ||
+    scheme_name === undefined ||
+    typeof scheme_name != "string"
+  ) {
+    res.status(400).json({
+      message: "invalid scheme_name",
+    });
   } else {
-    next()
+    next();
   }
-
-
-}
+};
 
 /*
   If `instructions` is missing, empty string or not a string, or
@@ -57,24 +59,24 @@ const validateScheme = (req, res, next) => {
   }
 */
 const validateStep = (req, res, next) => {
-
-  const {instructions, step_number } = req.body;
-
-  if ( !instructions ||
-     typeof(instructions) !== 'string' || 
-     !instructions.trim() || 
-     typeof step_number !== isNaN(step_number) || 
-     step_number < 1 ) {
-    next({status: 400, message: 'invalid step'})
+  const { instructions, step_number } = req.body;
+  if (
+    instructions === "" ||
+    instructions === undefined ||
+    typeof instructions != "string" ||
+    step_number < 0 ||
+    typeof step_number != "number"
+  ) {
+    res.status(400).json({
+      message: "invalid step",
+    });
   } else {
-    next()
+    next();
   }
-
-
-}
+};
 
 module.exports = {
   checkSchemeId,
   validateScheme,
   validateStep,
-}
+};
