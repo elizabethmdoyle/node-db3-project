@@ -17,7 +17,7 @@ const checkSchemeId = async (req, res, next) => {
     if(!scheme) {
       next({status:404,message: `scheme with scheme_id ${req.params.id} not found` })
     } else {
-      req.car = car
+      req.car = car;
       next()
     }
   } catch(err) {
@@ -34,12 +34,14 @@ const checkSchemeId = async (req, res, next) => {
     "message": "invalid scheme_name"
   }
 */
-const validateScheme = async (req, res, next) => {
+const validateScheme = (req, res, next) => {
 
   const {scheme_name} = req.body;
 
   if ( !scheme_name || typeof(scheme_name) !== 'string' || !scheme_name.trim() ) {
     next({status: 400, message: 'invalid scheme_name'})
+  } else {
+    next()
   }
 
 
@@ -58,7 +60,11 @@ const validateStep = (req, res, next) => {
 
   const {instructions, step_number } = req.body;
 
-  if ( !instructions || typeof(instructions) !== 'string' || !instructions.trim() || isNaN(step_number) || step_number < 1 ) {
+  if ( !instructions ||
+     typeof(instructions) !== 'string' || 
+     !instructions.trim() || 
+     typeof step_number !== isNaN(step_number) || 
+     step_number < 1 ) {
     next({status: 400, message: 'invalid step'})
   } else {
     next()
