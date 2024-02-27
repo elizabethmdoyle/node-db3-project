@@ -60,6 +60,8 @@ const validateStep = (req, res, next) => {
 
   if ( !instructions || typeof(instructions) !== 'string' || !instructions.trim() || isNaN(step_number) || step_number < 1 ) {
     next({status: 400, message: 'invalid step'})
+  } else {
+    next()
   }
 
 
